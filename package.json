@@ -3,12 +3,20 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "serve": "npx ts-node tests/scraper.ts"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@playwright/test": "^1.39.0",
     "@types/node": "^20.8.5"
+  },
+  "dependencies": {
+    "node-fetch": "^3.3.2",
+    "playwright-extra": "^4.3.6",
+    "puppeteer-extra-plugin-recaptcha": "^3.6.8",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
   }
 }

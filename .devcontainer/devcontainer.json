@@ -1,9 +1,16 @@
 {
 	"name": "Playwright Testing",
 	"image": "mcr.microsoft.com/playwright:v1.39.0-jammy",
-	"forwardPorts": [9323],
 	"postCreateCommand": "npm install",
 	"features": {
-		"ghcr.io/shyim/devcontainers-features/bun:0": {}
-	}
+		"ghcr.io/shyim/devcontainers-features/bun:0": {},
+		"ghcr.io/devcontainers/features/desktop-lite:1": {
+			"version": "latest",
+			"noVncVersion": "1.2.0",
+			"password": "codespaces",
+			"webPort": "6080",
+			"vncPort": "5901"
+		}
+	},
+	"forwardPorts": [6080,9323]
   }
