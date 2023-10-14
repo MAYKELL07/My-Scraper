@@ -8,22 +8,28 @@ const playwright = addExtra(require('playwright')).use(stealth);
 const app = express();
 const PORT = 3000;
 
-app.get('/scrape', async (req, res) => {
+app.post('/scrape', async (req, res) => {
+    const input = req.body.input; // Extract input from the request body
+
+    if (!input) {
+        return res.status(400).json({ error: 'Input not provided.' });
+    }
+
     try {
-        const scrapedText = await scrapeYouChatText();
+        const scrapedText = await scrapeYouChatText(input);
         res.json({ message: scrapedText });
     } catch (error) {
         res.status(500).json({ error: 'Failed to scrape the website.' });
     }
 });
 
-async function scrapeYouChatText() {
+async function scrapeYouChatText(input: string) {
     const maxRetries = 3; // Define the maximum number of retries
     let retries = 0;
 
     while (retries < maxRetries) {
         try {
-            const browser = await playwright.firefox.launch({ headless: true });
+            const browser = await playwright.firefox.launch({ headless: false });
             const context = await browser.newContext();
             const page = await context.newPage();
 
@@ -34,10 +40,10 @@ async function scrapeYouChatText() {
             ]);
 
             // Navigate to the target website
-            await page.goto('https://poe.com/PythonMind');
+            await page.goto('https://poe.com/Web-Search');
         
             // Fill in the text area and press Enter
-            await page.fill('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > footer > div > div > div.GrowingTextArea_growWrap__im5W3.ChatMessageInputContainer_textArea__fNi6E > textarea', 'what are you');
+            await page.fill('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > footer > div > div > div.GrowingTextArea_growWrap__im5W3.ChatMessageInputContainer_textArea__fNi6E > textarea', input);
             await page.keyboard.press('Enter');
         
             // Wait for the response message to show up
