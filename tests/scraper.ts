@@ -7,23 +7,26 @@ const playwright = addExtra(require('playwright')).use(stealth);
 
 const app = express();
 const PORT = 3000;
-
+app.use(express.json());
 app.post('/scrape', async (req, res) => {
-    const input = req.body.input; // Extract input from the request body
+    
+    console.log(req.body);
+    console.log(req.body.input);
+    const inputs = req.body.input; // Extract input from the request body
 
-    if (!input) {
+    if (!inputs) {
         return res.status(400).json({ error: 'Input not provided.' });
     }
 
     try {
-        const scrapedText = await scrapeYouChatText(input);
+        const scrapedText = await scrapeYouChatText(inputs);
         res.json({ message: scrapedText });
     } catch (error) {
         res.status(500).json({ error: 'Failed to scrape the website.' });
     }
 });
 
-async function scrapeYouChatText(input: string) {
+async function scrapeYouChatText(inputs: string) {
     const maxRetries = 3; // Define the maximum number of retries
     let retries = 0;
 
@@ -43,7 +46,7 @@ async function scrapeYouChatText(input: string) {
             await page.goto('https://poe.com/Web-Search');
         
             // Fill in the text area and press Enter
-            await page.fill('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > footer > div > div > div.GrowingTextArea_growWrap__im5W3.ChatMessageInputContainer_textArea__fNi6E > textarea', input);
+            await page.fill('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > footer > div > div > div.GrowingTextArea_growWrap__im5W3.ChatMessageInputContainer_textArea__fNi6E > textarea', inputs);
             await page.keyboard.press('Enter');
         
             // Wait for the response message to show up
