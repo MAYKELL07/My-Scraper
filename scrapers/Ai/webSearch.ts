@@ -1,38 +1,16 @@
-import express from 'express';
 import { addExtra } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 
 const stealth = StealthPlugin();
 const playwright = addExtra(require('playwright')).use(stealth);
 
-const app = express();
-const PORT = 3000;
-app.use(express.json());
-app.post('/scrape', async (req, res) => {
-    
-    console.log(req.body);
-    console.log(req.body.input);
-    const inputs = req.body.input; // Extract input from the request body
-
-    if (!inputs) {
-        return res.status(400).json({ error: 'Input not provided.' });
-    }
-
-    try {
-        const scrapedText = await scrapeYouChatText(inputs);
-        res.json({ message: scrapedText });
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to scrape the website.' });
-    }
-});
-
-async function scrapeYouChatText(inputs: string) {
+export async function scrapeYouChatText(inputs: string) {
     const maxRetries = 3; // Define the maximum number of retries
     let retries = 0;
 
     while (retries < maxRetries) {
         try {
-            const browser = await playwright.firefox.launch({ headless: false });
+            const browser = await playwright.chromium.launch({ headless: true });
             const context = await browser.newContext();
             const page = await context.newPage();
 
@@ -50,16 +28,17 @@ async function scrapeYouChatText(inputs: string) {
             await page.keyboard.press('Enter');
         
             // Wait for the response message to show up
-            await page.waitForSelector('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > div.InfiniteScroll_container__PHsd4.ChatMessagesView_infiniteScroll__vk3VX > div:nth-child(4) > div:nth-child(2) > div.ChatMessage_messageRow__DHlnq > div.ChatMessage_messageWrapper__4Ugd6 > div > div.Message_row__ug_UU > div > div > p');
+            await page.waitForSelector('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > div.InfiniteScroll_container__PHsd4.ChatMessagesView_infiniteScroll__vk3VX > div.ChatMessagesView_messagePair__ZEXUz > div:nth-child(2) > div.ChatMessage_messageRow__DHlnq > div.ChatMessage_messageWrapper__4Ugd6 > div > div.Message_row__ug_UU > div > div > p');
         
-            await page.waitForSelector('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > div.InfiniteScroll_container__PHsd4.ChatMessagesView_infiniteScroll__vk3VX > div:nth-child(4) > section.ChatMessageActionBar_actionBar__gyeEs > button:nth-child(2)')
+            await page.waitForSelector('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > div.InfiniteScroll_container__PHsd4.ChatMessagesView_infiniteScroll__vk3VX > div.ChatMessagesView_messagePair__ZEXUz > section.ChatMessageActionBar_actionBar__gyeEs > button:nth-child(2)')
             // Scrape the text and log the output
-            const responseText = await page.textContent('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > div.InfiniteScroll_container__PHsd4.ChatMessagesView_infiniteScroll__vk3VX > div:nth-child(4) > div:nth-child(2) > div.ChatMessage_messageRow__DHlnq > div.ChatMessage_messageWrapper__4Ugd6 > div > div.Message_row__ug_UU > div > div > p');
+            const responseText = await page.textContent('#__next > div.AnnouncementWrapper_container__Z51yh > div > main > div > div > div > div > div.InfiniteScroll_container__PHsd4.ChatMessagesView_infiniteScroll__vk3VX > div.ChatMessagesView_messagePair__ZEXUz > div:nth-child(2) > div.ChatMessage_messageRow__DHlnq > div.ChatMessage_messageWrapper__4Ugd6 > div > div.Message_row__ug_UU > div > div > p');
             console.log(responseText);
 
             await browser.close();
             return responseText; // Return the scraped text
         } catch (error) {
+            console.log(error);
             console.error(`Attempt ${retries + 1} failed. Retrying...`);
             retries++;
             if (retries === maxRetries) {
@@ -68,7 +47,3 @@ async function scrapeYouChatText(inputs: string) {
         }
     }
 }
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
