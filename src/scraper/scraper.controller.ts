@@ -12,4 +12,9 @@ export class ScraperController {
     ): Promise<string> {
         return await this.scraperService.AI(prompt, AIName);
     }
+
+    @Post('alodokter')
+    async scrapeAlodokter(@Body('inputText') inputText: string): Promise<string> {
+        return await this.scraperService.scrapeAlodokter(inputText);
+    }
 }

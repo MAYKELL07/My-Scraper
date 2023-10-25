@@ -40,4 +40,15 @@ export class ScraperService implements OnModuleInit, OnModuleDestroy {
             return responseText;
         }
     }
+    
+    async scrapeAlodokter(inputText: string): Promise<string> {
+        const context = await this.browser.newContext();
+        const page = await context.newPage();
+        await page.goto('https://www.alodokter.com');
+        await page.fill('#searchinput', inputText);
+        await page.click('div > div > div > a:nth-child(1)');
+        const paragraphText = await page.textContent('#postContent > p:nth-child(1)');
+        return paragraphText;
+    }
+    
 }
