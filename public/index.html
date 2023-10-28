@@ -1,0 +1,13 @@
+<!-- public/index.html -->
+<button id="scrapeBtn">Scrape</button>
+<div id="output"></div>
+<script>
+  document.getElementById('scrapeBtn').addEventListener('click', async () => {
+    const start = Date.now();
+    const response = await fetch('/scraper/AI', { method: 'POST' });
+    const data = await response.json();
+    const latency = Date.now() - start;
+    document.getElementById('output').innerText = JSON.stringify(data, null, 2) + "\nLatency: " + latency + "ms";
+  });
+</script>
+  

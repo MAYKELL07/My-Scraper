@@ -17,4 +17,9 @@ export class ScraperController {
     async scrapeAlodokter(@Body('inputText') inputText: string): Promise<string> {
         return await this.scraperService.scrapeAlodokter(inputText);
     }
+    
+    @Post('genshin-stats')
+    async scrapeGenshinStats(@Body('userUID') userUID: string): Promise<any> {
+        return await this.scraperService.scrapeGenshinStats(userUID);
+    }
 }
