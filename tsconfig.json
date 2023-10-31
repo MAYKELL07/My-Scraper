@@ -29,6 +29,6 @@
     "pretty": true,
     "stripInternal": true
   },
-  "include": ["./src/**/*.tsx", "./src/**/*.ts", "src/web/Components/AIForm.tsx"],
+  "include": ["./src/**/*.tsx", "./src/**/*.ts", "src/server"],
   "exclude": ["node_modules", "dist", "./test/**/*.spec.ts"]
 }
