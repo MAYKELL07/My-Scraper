@@ -10,7 +10,7 @@ export class ScraperService implements OnModuleInit, OnModuleDestroy {
 
     async onModuleInit() {
         const playwright = addExtra(require('playwright')).use(StealthPlugin());
-        this.browser = await playwright.chromium.launch({ headless: false });
+        this.browser = await playwright.chromium.launch({ headless: true });
         this.cookieData = await fs.readFile('./src/server/scraper/cookie.json', 'utf8');
     }
 
