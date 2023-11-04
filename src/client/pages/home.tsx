@@ -85,7 +85,8 @@ const Home = () => {
               <button type="submit" className="mt-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Search</button>
             </form>
             <div className="mt-4">
-              <strong>Alodokter Response:</strong> {formData.alodokterResponse}
+              <strong>Alodokter Response:</strong>
+              <pre className="bg-gray-200 p-2 rounded-md">{JSON.stringify(formData.alodokterResponse, null, 2)}</pre>
             </div>
           </div>
 

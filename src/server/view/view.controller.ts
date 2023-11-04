@@ -6,7 +6,7 @@ import { ViewService } from './view.service';
 export class ViewController {
   constructor(private viewService: ViewService) {}
 
-  @Get(['/', '_next*', 'favicon.ico'])
+  @Get(['/home', '_next*', 'favicon.ico'])
   public async handleRequest(@Req() req: Request, @Res() res: Response) {
     await this.viewService.handler(req, res);
   }
