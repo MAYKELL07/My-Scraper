@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import axios from 'axios';
+import '../../../styles/global.css';
 
 const Home = () => {
   const [formData, setFormData] = useState({
