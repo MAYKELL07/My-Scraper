@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Res } from '@nestjs/common';
+import { Controller, Post, Body, Get, Res, HttpStatus } from '@nestjs/common';
 import { ScraperService } from './scraper.service';
 import { Response } from 'express';
 
@@ -33,5 +33,20 @@ export class ScraperController {
         } catch (error) {
             res.status(500).send('Failed to capture screenshot');
         }
+    }
+
+    @Post('instagrampost')
+    async scrapeInstagram(@Body('postUrl') postUrl: string, @Res() res: Response) {
+      try {
+        const screenshotBuffer = await this.scraperService.scrapeInstagramPost(postUrl);
+        res.setHeader('Content-Type', 'image/jpeg');
+        res.send(screenshotBuffer);
+      } catch (error: any) { // Type assertion here
+        res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+          statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+          message: 'Error scraping Instagram post',
+          error: error.message,
+        });
+      }
     }
 }

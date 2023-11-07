@@ -139,4 +139,31 @@ export class ScraperService implements OnModuleInit, OnModuleDestroy {
         return screenshotBuffer;
     }
 
+    async scrapeInstagramPost(postUrl: string): Promise<Buffer> {
+        const context = await this.browser.newContext({
+            userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+            viewport: { width: 1920, height: 1080 } // Set high-resolution viewport
+        });
+        const page = await context.newPage();
+        await page.goto(postUrl, { waitUntil: 'domcontentloaded' });
+
+        // Locator for the target element to screenshot
+        const targetElementLocator = page.locator('div._aagw');
+        await targetElementLocator.waitFor();
+
+        // Hide the specified element using locator
+        const tagsDivLocator = page.locator('div._a9-5._a9-6._a9-7');
+        if (await tagsDivLocator.count() > 0) {
+            await tagsDivLocator.waitFor();
+            await tagsDivLocator.evaluate(node => (node as HTMLElement).style.display = 'none');
+        }
+
+        // Take a high-quality screenshot of the target element
+        const screenshotBuffer = await targetElementLocator.screenshot({ quality: 100, type: 'jpeg' });
+
+        //await context.close();
+        return screenshotBuffer;
+    }
+
+
 }

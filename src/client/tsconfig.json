@@ -22,8 +22,8 @@
   "include": [
     "next-env.d.ts",
     "next.config.js",
-    "pages/**/*.ts",
-    "pages/**/*.tsx"
+    "src/**/**/*.ts",
+    "src/**/**/*.tsx"
   ],
   "exclude": [
     "node_modules"
