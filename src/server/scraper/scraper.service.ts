@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { addExtra } from 'playwright-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth'
+import { Locator } from 'playwright';
 
 @Injectable()
 export class ScraperService implements OnModuleInit, OnModuleDestroy {
@@ -161,9 +162,54 @@ export class ScraperService implements OnModuleInit, OnModuleDestroy {
         // Take a high-quality screenshot of the target element
         const screenshotBuffer = await targetElementLocator.screenshot({ quality: 100, type: 'jpeg' });
 
-        //await context.close();
+        await context.close();
         return screenshotBuffer;
     }
 
+    async scrapeTikTokVideo(downloadUrl: string): Promise<string | string[]> {
+        try {
+            const context = await this.browser.newContext({
+                userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/118.0.0.0 Safari/537.36',
+            });
+            const page = await context.newPage();
+            await page.goto('https://tiktokdownload.online/id', { waitUntil: 'domcontentloaded' });
 
+            await page.fill('#main_page_text', downloadUrl);
+            await page.press('#main_page_text', 'Enter');
+
+            await page.waitForSelector('#trending-actions > div.d-flex.flex-1.align-items-center.justify-content-start > div:nth-child(2)');
+
+            const listLocator = page.locator('#main_area_slides > ul');
+            const listCount = await listLocator.count();
+            console.log(listCount)
+
+            if (listCount > 0) {
+                const itemsLocator = listLocator.locator('li > a');
+                const itemCount = await itemsLocator.count();
+                const slideLinks: string[] = [];
+                console.log(itemCount)
+
+                for (let i = 0; i < itemCount; i++) {
+                    const href = await itemsLocator.nth(i).getAttribute('href');
+                    console.log(href)
+                    if (href) {
+                        slideLinks.push(href);
+                    }
+                }
+                await context.close();
+
+                return slideLinks;
+            } else {
+                const downloadButtonLocator: Locator = page.locator('#mainpicture > div > div.flex-1.result_overlay_buttons.pure-u-1.pure-u-sm-1-2 > a.pure-button.pure-button-primary.is-center.u-bl.dl-button.download_link.without_watermark.vignette_active.notranslate');
+                await downloadButtonLocator.waitFor();
+                const href = await downloadButtonLocator.getAttribute('href');
+                await context.close();
+
+                return href;
+            }
+        } catch (error) {
+            console.error('Error scraping TikTok:', error);
+            throw error;
+        }
+    }
 }
